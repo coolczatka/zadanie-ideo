@@ -1,0 +1,12 @@
+.plus{
+    font-size:20px;
+    margin-right: 10px;
+    cursor: pointer;
+    color:green;
+}
+.minus{
+    font-size:20px;
+    margin-right: 10px;
+    cursor: pointer;
+    color: red;
+}

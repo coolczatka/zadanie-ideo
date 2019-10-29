@@ -17,4 +17,5 @@ class Tree extends Model
     {
         return $this->hasMany(Node::class);
     }
+
 }

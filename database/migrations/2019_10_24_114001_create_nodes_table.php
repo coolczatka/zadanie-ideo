@@ -15,10 +15,9 @@ class CreateNodesTable extends Migration
     {
         Schema::create('nodes', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->string('name')->unique();
+            $table->string('name');
             $table->unsignedBigInteger('tree_id');
             $table->bigInteger('parent_id')->nullable(); //null = root
-
             $table->foreign('tree_id')->references('id')->on('trees')->onDelete('cascade');
         });
     }

@@ -1,5 +1,4 @@
 <?php
-
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -16,4 +15,7 @@ Auth::routes();
 
 Route::get('/home', 'HomeController@index')->name('home');
 Route::get('/tree/{id}','TreeController@detail')->name('detail');
-Route::post('/tree','TreeController@getchildren')->name('children');
+Route::get('/nodes/{tree_id}','TreeController@getchildren')->name('get_nodes');
+Route::post('/nodes','TreeController@create_node')->name('create_node');
+Route::post('/nodes/delete','TreeController@delete_node')->name('delete_node');
+Route::get('/mytrees','TreeController@mytrees')->name('my_trees');

@@ -11,8 +11,11 @@
     color: red;
 }
 .node{
-    margin-left:10px;
+    margin-left:20px;
 }
 .card:hover{
     background: aliceblue;
+}
+.btn-secondary{
+    width:100%;
 }

@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Validator;
 
 class TreeController extends Controller
 {
+
     public function index(){
         $trees =Tree::all();
 
@@ -29,28 +30,33 @@ class TreeController extends Controller
         return view('detail')->with('is_owner',$is_owner);
     }
 
-    public function getChildren(Request $request, Int $tree_id){
+    public function getChildren(Request $request, Int $tree_id)
+    {
         $id = $request->get('id');
-        if(!auth()->guest())
+        if (!auth()->guest())
             $is_owner = (Tree::find($tree_id)->user_id == auth()->user()->id) ? true : false;
         else
             $is_owner = false;
-        if ($id == 0)
-            return response()->json(['children' =>Node::where('parent_id', null)->where('tree_id',$tree_id)->get(),'owner'=>$is_owner]);
-        else
-            $node = Node::findOrFail($id);
-        return response()->json(['children' => $node->get_direct_children(),'owner'=>$is_owner]);
+
+        $r = response()->json(['children' => Node::get_direct_children_s($id,$tree_id,
+            ($request->sort_column ?? 'id')), 'owner' => $is_owner]);
+        return $r;
     }
 
     public function getFullTree(Int $tree_id){
         $tree = Tree::findOrFail($tree_id);
-        return view('full_tree')->with('tree',$tree);
+        if(!auth()->guest())
+            $is_owner = $tree->user->id == auth()->user()->id ? true : false;
+        else
+            $is_owner = false;
+        return view('whole_tree')->with('tree',$tree)->with(['is_owner'=>$is_owner]);
     }
 
     public function create_node(Request $request){
+        $request->parent_id = $request->parent_id==0 ? null : $request->parent_id;
         $validator = Validator::make($request->all(),[
                 'name' => 'required',
-                'parent_id' => 'required|exists:nodes,id',
+                'parent_id' => 'required:exists:nodes,id',
                 'tree_id' => 'required|exists:trees,id'
         ]);
 
@@ -76,17 +82,16 @@ class TreeController extends Controller
 
 
     public function delete_node(Request $request){
-
         if (!auth()->guest() && $this->permissionToNode($request,'tree_id','id') ) {
             $node = Node::find($request->id);
             if ($node != null) {
-                if ($request->with == 1) {
+                if ($request->with == 'with') {
                     $node->delete_with_children();
                 }
-                if ($request->with == 0) {
+                if ($request->with == 'without') {
                     $node->delete_without_children();
                 }
-                return response()->json(['del' => true]);
+                return response()->json(['del' => $request->all()]);
             }
             return response()->json(['error'=>'bad id']);
         }
@@ -98,8 +103,20 @@ class TreeController extends Controller
             'parent_id' => 'exists:nodes,id',
             'tree_id' => 'exists:trees,id'
         ]);
+        if($this->permissionToNode($request,'tree_id','id')){
+            if(!$validator->fails()){
+                $node = Node::findOrFail($request->id);
+                $node->parent_id = $request->parent_id ?? $node->parent_id;
+                $node->name = $request->name ?? $node->name;
+                $node->save();
+                return $node;
+            }
+            else
+                response()->json(['error' => $validator->errors()]);
+        }
+        else
+            return response()->json(['error'=>'Permission error']);
     }
-
 
     public function mytrees(){
 
@@ -112,7 +129,8 @@ class TreeController extends Controller
     {
         try {
             if(auth()->user()->id != Tree::find($request->post($tree_name))->user_id ||
-                auth()->user()->id != Tree::find(Node::find($request->post($node_name))->tree_id)->user_id)
+                ($request->post($node_name)!= 0 &&
+                auth()->user()->id != Tree::find(Node::find($request->post($node_name))->tree_id)->user_id))
                 return false;
             else
                 return true;

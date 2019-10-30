@@ -3,12 +3,10 @@
 @section('content')
     <script>
         var sort_column = '';
-        function init() {
+        function init_f() {
             document.getElementById('add_mn_button').addEventListener('click',add_create_form);
             document.getElementById('sort_name_button').addEventListener('click',sort_name);
             document.getElementById('sort_id_button').addEventListener('click',sort_id);
-            document.getElementById('whole_tree_button').addEventListener('click',whole_tree);
-            getChildren(0);
         }
         function sort_name() {
             sort_column = 'name';
@@ -19,14 +17,6 @@
             sort_column = 'id';
             document.querySelector('#nodes').innerHTML="";
             getChildren(0)
-        }
-
-        async function whole_tree() {
-            while(document.querySelector('.reduced')!== null) {
-                let x = document.querySelector('.reduced');
-                await x.querySelector('.plus').click();
-                x.classList.remove('reduced');
-            }
         }
         function getChildren(id) {
             let url = "{{route('get_nodes',['tree_id'=>last(explode('/',request()->url()))])}}"+"?id="+id;
@@ -43,7 +33,6 @@
                     let element = document.createElement('div');
                     element.setAttribute('id',obj.id);
                     element.classList.add('node');
-                    element.classList.add('reduced');
                     element.innerHTML='<div class="row mt-1">' +
                         '                <div class="col-12">' +
                         '                    <div class="card node_body">' +
@@ -75,7 +64,6 @@
             e.target.removeEventListener('click',expand);
             e.target.addEventListener('click',reduce);
             let id = findClosestParentId(e.target);
-            document.getElementById(id).classList.remove('reduced');
             getChildren(id);
 
         }
@@ -86,7 +74,6 @@
             e.target.addEventListener('click',expand);
             let id = findClosestParentId(e.target);
             let parent = document.getElementById(id);
-            parent.classList.add('reduced');
             parent.querySelectorAll('.node').forEach(el =>{
                 if(el!==parent)
                     el.remove();
@@ -242,15 +229,26 @@
         <div class="control row mt-1">
 
             @if($is_owner)<div class="col-md-3"><button id="add_mn_button" class="btn-secondary btn-success">Add main node</button></div>@endif
-            <div class="col-md-3"><button id="whole_tree_button" class="btn-secondary">Show whole tree</button></div>
-                <div class="col-md-3"><button id="sort_name_button" class="btn-secondary">Sort by name</button></div>
+                <div class="col-md-3"><button id="sort_name_button" class="btn-secondary">
+                        Sort by name</button></div>
             <div class="col-md-3"><button id="sort_id_button" class="btn-secondary">Sort by id </button></div>
         </div>
         <div class="nodes" id="nodes">
-
+            @foreach($tree->root_nodes as $node)
+                <div class="row mt-1">
+                                    <div class="col-12">
+                                            <div class="card node_body">
+                                                    <div class="card-body pt-0 pb-0"><span  class="plus">v</span> {{$node->name}}
+                                                            @if($is_owner)<div class="float-right"><button class="btn-success nod">Add child</button> <button class="btn-danger">
+                                                                Delete node</button> <button class="btn-warning">Edit node</button></div>@endif</div>
+                                                </div>
+                                        </div>
+                                </div>
+            @endforeach
         </div>
     </div>
     <script>
-            init();
+        init_f();
+
     </script>
 @endsection

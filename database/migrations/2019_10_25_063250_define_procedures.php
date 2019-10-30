@@ -73,11 +73,14 @@ class DefineProcedures extends Migration
     private function get_direct_children_create(){
         return "
             Drop procedure if exists get_direct_children;
-            CREATE PROCEDURE 
-            get_direct_children(IN parent INT)
+            CREATE PROCEDURE get_direct_children(IN parent INT, IN col VARCHAR(30), IN way VARCHAR(30))
             BEGIN
-            SELECT * from nodes where 
-            nodes.parent_id = parent;
+            SET @q = CONCAT('SELECT * from nodes where 
+            nodes.parent_id = ',parent,' order by ',col,' ',way);
+            PREPARE query from @q;
+            EXECUTE query;
+            DEALLOCATE PREPARE query;
+            
             END;";
     }
 

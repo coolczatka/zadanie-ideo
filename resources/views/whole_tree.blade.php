@@ -242,7 +242,7 @@
                                                             @if($is_owner)<div class="float-right"><button class="btn-success nod">Add child</button> <button class="btn-danger">
                                                                 Delete node</button> <button class="btn-warning">Edit node</button></div>@endif</div>
                                                 </div>
-                                        </div>
+                                          </div>
                                 </div>
             @endforeach
         </div>

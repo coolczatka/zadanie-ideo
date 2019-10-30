@@ -13,9 +13,12 @@
 .node{
     margin-left:20px;
 }
-.card:hover{
-    background: aliceblue;
-}
 .btn-secondary{
     width:100%;
+}
+.button_tnf{
+    width:25%;
+}
+.input_tree_name{
+    width:73%;
 }

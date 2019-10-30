@@ -37,7 +37,7 @@
                     <ul class="navbar-nav mr-auto">
                         @auth
                             <li class="nav-item">
-                                <a class="nav-link" href="{{ route('index') }}">Add tree</a>
+                                <a class="nav-link" href="{{ route('index') }}">All trees</a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link" href="{{ route('my_trees') }}">My trees</a>

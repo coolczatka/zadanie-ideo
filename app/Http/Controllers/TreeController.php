@@ -119,11 +119,22 @@ class TreeController extends Controller
     }
 
     public function mytrees(){
-
-        return view('home');
+        if(!auth()->guest()){
+            $trees = Tree::all()->where('user_id',auth()->user()->id);
+            return view('home',['trees'=>$trees]);
+        }
+        redirect()->route('login');
     }
 
+    public function add_tree(Request $request){
 
+            $tree = new Tree();
+            $tree->name = $request->name;
+            $tree->user_id = auth()->user()->id;
+            $tree->save();
+            return redirect()->route('detail',[$tree->id]);
+
+    }
 
     private function permissionToNode(Request $request, String $tree_name, String $node_name)
     {

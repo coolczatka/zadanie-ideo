@@ -18,6 +18,6 @@ Route::get('/tree/{id}','TreeController@detail')->name('detail');
 Route::get('/nodes/{tree_id}','TreeController@getchildren')->name('get_nodes');
 Route::post('/nodes','TreeController@create_node')->name('create_node');
 Route::post('/nodes/delete','TreeController@delete_node')->name('delete_node');
-Route::get('/mytrees','TreeController@mytrees')->name('my_trees');
 Route::post('/nodes/patch','TreeController@patch')->name('update_node');
-Route::get('/nodes/{tree_id}/whole','TreeController@getFullTree')->name('whole_tree');
+Route::get('/mytrees','TreeController@mytrees')->name('my_trees');
+Route::post('/tree','TreeController@add_tree')->name('add_tree');

@@ -21,10 +21,10 @@
             getChildren(0)
         }
 
-        async function whole_tree() {
+        function whole_tree() {
             while(document.querySelector('.reduced')!== null) {
                 let x = document.querySelector('.reduced');
-                await x.querySelector('.plus').click();
+                x.querySelector('.plus').click();
                 x.classList.remove('reduced');
             }
         }

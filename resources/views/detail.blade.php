@@ -51,7 +51,7 @@
                     element.innerHTML='<div class="row mt-1">' +
                         '                <div class="col-12">' +
                         '                    <div class="card node_body">' +
-                        '                        <div class="card-body pt-0 pb-0"><span  class="plus">></span>'+'<a href="{{route('detail',$tree_id)}}/'+obj.id+'">'+obj.id+' - '+obj.name +
+                        '                        <div class="card-body pt-0 pb-0"><span  class="plus">></span>'+'<a href="{{route('detail',$tree_id)}}/'+obj.id+'">'+obj.id+' - '+obj.name + '</a>' +
                         '                            @if($is_owner)<div class="float-right"><button class="btn-success nod">Add child</button> <button class="btn-danger">Delete node</button> <button class="btn-warning">Edit node</button></div>@endif</div>' +
                         '                    </div>' +
                         '                </div>' +
@@ -144,8 +144,12 @@
                 }
                 else {
                     form.remove();
-                    parent.querySelector('.plus').click();
-                    parent.querySelector('.plus').click();
+                    if(parent.classList.contains('reduced'))
+                        parent.querySelector('.plus').click();
+                    else {
+                        parent.querySelector('.plus').click();
+                        parent.querySelector('.plus').click();
+                    }
                 }
             })
         }

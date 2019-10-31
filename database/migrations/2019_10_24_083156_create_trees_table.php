@@ -17,7 +17,7 @@ class CreateTreesTable extends Migration
             $table->bigIncrements('id');
             $table->unsignedBigInteger('user_id');
             $table->timestamps();
-            $table->string('name')->unique();
+            $table->string('name');
 
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });

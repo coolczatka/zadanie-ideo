@@ -2,7 +2,9 @@
 
 @section('content')
     <div class="container">
+        @guest<div class="row justify-content-center" style="text-align: center;"><div class="col-md-12"> <div class="h3">Log in to add your own tree</div> </div></div> @endguest
         <div class="row justify-content-center">
+
             @foreach($trees as $tree)
             <div class="col-md-4">
                 <div class="card mt-4">
@@ -15,7 +17,7 @@
                     </a>
                 </div>
             </div>
-                @endforeach
+            @endforeach
         </div>
     </div>
 @endsection

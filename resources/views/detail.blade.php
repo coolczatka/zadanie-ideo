@@ -105,7 +105,7 @@
                 element = document.getElementById(id);
             }
             else {
-                id = 0;
+                id = Number.parseInt("{{$start_node}}");
                 element = document.getElementById('nodes');
             }
             let form = document.createElement('form');

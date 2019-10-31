@@ -3,22 +3,26 @@
 @section('content')
     <script>
         var sort_column = '';
+        var token;
         function init() {
+            token = document.head.querySelector('meta[name="csrf-token"').getAttribute('content');
+            @if($is_owner)
             document.getElementById('add_mn_button').addEventListener('click',add_create_form);
+            @endif
             document.getElementById('sort_name_button').addEventListener('click',sort_name);
             document.getElementById('sort_id_button').addEventListener('click',sort_id);
             document.getElementById('whole_tree_button').addEventListener('click',whole_tree);
-            getChildren(0);
+            getChildren({{$start_node}});
         }
         function sort_name() {
             sort_column = 'name';
             document.querySelector('#nodes').innerHTML="";
-            getChildren(0)
+            getChildren({{$start_node}})
         }
         function sort_id() {
             sort_column = 'id';
             document.querySelector('#nodes').innerHTML="";
-            getChildren(0)
+            getChildren({{$start_node}})
         }
 
         function whole_tree() {
@@ -29,14 +33,14 @@
             }
         }
         function getChildren(id) {
-            let url = "{{route('get_nodes',['tree_id'=>last(explode('/',request()->url()))])}}"+"?id="+id;
+            let url = "{{route('get_nodes',$tree_id)}}"+"?id="+id;
             if(sort_column !== '')
                 url+=("&sort_column="+sort_column);
             fetch(url).then(resp=>resp.json()).then(resp =>{
                 console.log(resp);
                 resp.children.forEach(obj =>{
                     let container;
-                    if(id===0)
+                    if(id===Number.parseInt("{{$start_node}}"))
                         container = document.getElementById('nodes');
                     else
                         container = document.getElementById(id);
@@ -47,7 +51,7 @@
                     element.innerHTML='<div class="row mt-1">' +
                         '                <div class="col-12">' +
                         '                    <div class="card node_body">' +
-                        '                        <div class="card-body pt-0 pb-0"><span  class="plus">></span>'+obj.id+' - '+obj.name +
+                        '                        <div class="card-body pt-0 pb-0"><span  class="plus">></span>'+'<a href="{{route('detail',$tree_id)}}/'+obj.id+'">'+obj.id+' - '+obj.name +
                         '                            @if($is_owner)<div class="float-right"><button class="btn-success nod">Add child</button> <button class="btn-danger">Delete node</button> <button class="btn-warning">Edit node</button></div>@endif</div>' +
                         '                    </div>' +
                         '                </div>' +
@@ -110,9 +114,9 @@
                 old_form.remove();
             }
             form.setAttribute('method','post');
-            let temp = window.location.href.split('/');
-            let tree_id = temp[temp.length-1];
-            form.innerHTML = '<label for="name">Name</label><input type="text" id="name" name="name" />' +
+            let tree_id = "{{$tree_id}}";
+            form.innerHTML = '@csrf' +
+                '<label for="name">Name</label><input type="text" id="name" name="name" />' +
                 '<input type="hidden" name="parent_id" value="'+id+'"/> ' +
                 '<input type="hidden" name="tree_id" value="'+tree_id+'"/>' +
                 '<button type="submit">Add</button>';
@@ -136,7 +140,7 @@
                 console.log(resp);
                 if(parent.classList.contains('nodes')){
                     parent.innerHTML="";
-                    getChildren(0);
+                    getChildren({{$start_node}});
                 }
                 else {
                     form.remove();
@@ -162,7 +166,7 @@
                 let parent = form.parentNode.parentNode;
                 if(parent.classList.contains('nodes')){
                     parent.innerHTML="";
-                    getChildren(0);
+                    getChildren({{$start_node}});
                 }
                 else {
                     form.remove();
@@ -181,14 +185,14 @@
                 old_form.remove();
             }
             form.setAttribute('method','post');
-            let temp = window.location.href.split('/');
-            let tree_id = temp[temp.length-1];
+            let tree_id = "{{$tree_id}}";
             form.innerHTML =
                 '<div class="radio"><label for="option1"><input type="radio" class="del_radio" checked value="with" name="with" />Delete with children</label></div>' +
                 '<div class="radio"><label for="option2"><input type="radio" class="del_radio" value="without" name="with" />' +
                 'Add children to parent of removed node</label></div>' +
                 '<input type="hidden" name="tree_id" value="'+tree_id+'"/>' +
                 '<input type="hidden" name="id" value="'+id+'"/>' +
+                '@csrf' +
                 '<button class="btn-danger" type="submit">Remove</button>';
             element.appendChild(form);
             form.addEventListener('submit',del);
@@ -203,9 +207,9 @@
                 old_form.remove();
             }
             form.setAttribute('method','post');
-            let temp = window.location.href.split('/');
-            let tree_id = temp[temp.length-1];
-            form.innerHTML = '<label for="name">Name</label><input type="text" id="name" name="name" />' +
+            let tree_id = "{{$tree_id}}";
+            form.innerHTML = '@csrf' +
+                '<label for="name">Name</label><input type="text" id="name" name="name" />' +
                 '<input type="hidden" name="id" value="'+id+'">' +
                 '<label for="parent_id">Parent ID</label><input type="number" name="parent_id"/> ' +
                 '<input type="hidden" name="tree_id" value="'+tree_id+'"/>' +
@@ -228,7 +232,7 @@
                 let parent = form.parentNode.parentNode;
                 if(parent.classList.contains('nodes')){
                     parent.innerHTML="";
-                    getChildren(0);
+                    getChildren({{$start_node}});
                 }
                 else {
                     form.remove();
@@ -242,7 +246,7 @@
         <div class="control row mt-1">
 
             @if($is_owner)<div class="col-md-3"><button id="add_mn_button" class="btn-secondary btn-success">Add main node</button></div>@endif
-            <div class="col-md-3"><button id="whole_tree_button" class="btn-secondary">Show whole tree</button></div>
+            <div class="col-md-3"><button id="whole_tree_button" class="btn-secondary">Expand nodes</button></div>
                 <div class="col-md-3"><button id="sort_name_button" class="btn-secondary">Sort by name</button></div>
             <div class="col-md-3"><button id="sort_id_button" class="btn-secondary">Sort by id </button></div>
         </div>
@@ -252,5 +256,6 @@
     </div>
     <script>
             init();
+
     </script>
 @endsection

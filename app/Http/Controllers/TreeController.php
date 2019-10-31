@@ -21,13 +21,22 @@ class TreeController extends Controller
         return view('index',['trees' => $trees]);
     }
 
-    public function detail(Int $id){
-        $tree = Tree::findOrFail($id);
+    public function detail(Int $tree_id){
+        $tree = Tree::findOrFail($tree_id);
         if(!auth()->guest())
             $is_owner = $tree->user->id == auth()->user()->id ? true : false;
         else
             $is_owner = false;
-        return view('detail')->with('is_owner',$is_owner);
+        return view('detail',['is_owner'=>$is_owner,'start_node'=>0,'tree_id'=>$tree_id]);
+    }
+
+    public function part_of_tree(Int $tree_id, Int $node_id){
+        $tree = Tree::findOrFail($tree_id);
+        if(!auth()->guest())
+            $is_owner = $tree->user->id == auth()->user()->id ? true : false;
+        else
+            $is_owner = false;
+        return view('detail',['is_owner'=>$is_owner,'start_node'=>$node_id,'tree_id'=>$tree_id]);
     }
 
     public function getChildren(Request $request, Int $tree_id)
@@ -121,7 +130,7 @@ class TreeController extends Controller
     public function mytrees(){
         if(!auth()->guest()){
             $trees = Tree::all()->where('user_id',auth()->user()->id);
-            return view('home',['trees'=>$trees]);
+            return view('home')->with('trees',$trees ?? []);
         }
         redirect()->route('login');
     }
@@ -132,7 +141,7 @@ class TreeController extends Controller
             $tree->name = $request->name;
             $tree->user_id = auth()->user()->id;
             $tree->save();
-            return redirect()->route('detail',[$tree->id]);
+            return redirect()->route('detail',['id'=>$tree->id]);
 
     }
 

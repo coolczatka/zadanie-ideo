@@ -55,13 +55,20 @@ class DefineProcedures extends Migration
         ";
     }
 
+
     private function delete_with_children_create(){
         return "
             drop procedure if exists delete_with_children;
             CREATE PROCEDURE
             delete_with_children(IN node INT)
             BEGIN
-            DELETE FROM nodes WHERE id = node or parent_id= node;
+                WITH recursive subtree as(
+                select id from nodes where id = node
+                union all
+                select child.id from nodes as child
+                join subtree as parent on child.parent_id = parent.id)
+                DELETE from nodes where id in (select * from subtree);
+
             END;
         ";
     }

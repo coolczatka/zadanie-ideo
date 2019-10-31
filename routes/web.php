@@ -21,3 +21,4 @@ Route::post('/nodes/delete','TreeController@delete_node')->name('delete_node');
 Route::post('/nodes/patch','TreeController@patch')->name('update_node');
 Route::get('/mytrees','TreeController@mytrees')->name('my_trees');
 Route::post('/tree','TreeController@add_tree')->name('add_tree');
+Route::get('/tree/{tree_id}/{node_id}','TreeController@part_of_tree')->name('part');
